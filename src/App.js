@@ -6,24 +6,29 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      time: 10,
+      minutes: 25,
+      seconds: 0,
       running: false
     }
     this.timer = this.timer.bind(this);
     this.toggleRunning = this.toggleRunning.bind(this);
+    this.reset = this.reset.bind(this);
   }
 
   //test setTimeout
   timer(){
-    
- 
     const timerID = setInterval(()=>{
-      console.log("this.state.time = " + this.state.time);
-      if(this.state.time > 0 && this.state.running){
+      if(this.state.minutes > 0 && this.state.seconds > 0 && this.state.running){
         this.setState({
-          time: this.state.time - 1
+          seconds: this.state.seconds - 1
         })
-      } else {
+      } else if(this.state.minutes > 0 && this.state.seconds === 0 && this.state.running){
+        this.setState({
+          minutes: this.state.minutes - 1,
+          seconds: 59
+        })
+      } 
+      else {
         clearInterval(timerID)
       }
     }, 1000);
@@ -45,20 +50,27 @@ class App extends Component {
       }
     }
 
+  //reset button
+  reset(){
+    this.setState(
+      {
+        minutes: 25, //reset these numbers to variables available from state
+        seconds: 0,
+        running: false
+      }
+    )
+  }
+
   
     
 
   render() {
-    let test = ()=>{
-      console.log("Minutes = " + 238/60);
-      console.log("Seconds = " + 238%60);
-    }
-    test();
     return (
       <div className="App">
         <header className="App-header">
-          <Session time={this.state.time} />
-          <button onClick={this.toggleRunning}>Start/Stop</button>
+          <Session minutes={this.state.minutes} seconds={this.state.seconds}/>
+          <button id="start_stop" onClick={this.toggleRunning}>Start/Stop</button>
+          <button id="reset" onClick={this.reset}>Reset</button>
         </header>
       </div>
     );
@@ -66,8 +78,12 @@ class App extends Component {
 }
 
 function Session (props) {
-  return <h1>{props.time}</h1>;
-
+  return (
+    <div>
+      <h3 id="timer-label">Session</h3>
+      <h1 id="time-left">{props.minutes}:{("0" + props.seconds).slice(-2)}</h1>
+    </div>
+  );
 }
 
 export default App;
