@@ -8,11 +8,17 @@ class App extends Component {
     this.state = {
       minutes: 25,
       seconds: 0,
+      breakLength: 5,
+      sessionLength: 25,
       running: false
     }
     this.timer = this.timer.bind(this);
     this.toggleRunning = this.toggleRunning.bind(this);
     this.reset = this.reset.bind(this);
+    this.decrementBreak = this.decrementBreak.bind(this);
+    this.incrementBreak = this.incrementBreak.bind(this);
+    this.decrementSession = this.decrementSession.bind(this);
+    this.incrementSession = this.incrementSession.bind(this);
   }
 
   //test setTimeout
@@ -54,14 +60,52 @@ class App extends Component {
   reset(){
     this.setState(
       {
-        minutes: 25, //reset these numbers to variables available from state
+        minutes: 25, 
         seconds: 0,
+        breakLength: 5,
+        sessionLength: 25,
         running: false
       }
     )
   }
 
-  
+  /*need to update increment and decrement functions so break length and 
+  session length update the minutes and seconds.  Minutes and seconds may
+  need to be changed to breakMinutes and sessionMinutes.
+  */
+  decrementBreak() {
+		if(this.state.breakLength > 1 && !this.state.running){
+        this.setState({
+        breakLength: this.state.breakLength - 1,
+        minutes: this.state.breakLength - 1,
+        seconds: 0
+      })
+    }
+  }
+
+  incrementBreak() {
+    if(this.state.breakLength < 59){
+      this.setState({
+        breakLength: this.state.breakLength + 1
+      })
+    }
+  }
+
+  decrementSession() {
+    if(this.state.sessionLength > 1){
+      this.setState({
+        sessionLength: this.state.sessionLength - 1
+      })
+    }
+  }
+
+  incrementSession() {
+    if(this.state.sessionLength < 59){
+      this.setState({
+        sessionLength: this.state.sessionLength + 1
+      })
+    }
+  }
     
 
   render() {
@@ -71,6 +115,16 @@ class App extends Component {
           <Session minutes={this.state.minutes} seconds={this.state.seconds}/>
           <button id="start_stop" onClick={this.toggleRunning}>Start/Stop</button>
           <button id="reset" onClick={this.reset}>Reset</button>
+          <BreakControls 
+            breakLength={this.state.breakLength}
+            decrement={this.decrementBreak}
+            increment={this.incrementBreak}
+            />
+            <SessionControls 
+              sessionLength={this.state.sessionLength}
+              decrement={this.decrementSession}
+              increment={this.incrementSession}
+              />
         </header>
       </div>
     );
@@ -84,6 +138,28 @@ function Session (props) {
       <h1 id="time-left">{props.minutes}:{("0" + props.seconds).slice(-2)}</h1>
     </div>
   );
+}
+
+function BreakControls (props) {
+  return(
+    <div>
+      <h4 id="break-label">Break Length</h4>
+      <p id="break-length">{props.breakLength}</p>
+      <button id="break-decrement" onClick={props.decrement}>-</button>
+      <button id="break-increment" onClick={props.increment}>+</button>
+    </div> 
+  );
+}
+
+function SessionControls (props) {
+  return(
+    <div>
+      <h4 id="session-label">Session Length</h4>
+      <p id="session-length">{props.sessionLength}</p>
+      <button id="session-decrement" onClick={props.decrement}>-</button>
+      <button id="session-increment" onClick={props.increment}>+</button>
+    </div>
+  )
 }
 
 export default App;
