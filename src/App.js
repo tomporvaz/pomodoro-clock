@@ -10,10 +10,13 @@ class App extends Component {
       seconds: 0,
       breakLength: 5,
       sessionLength: 25,
-      running: false
+      mode: "Session",
+      running: false,
+      started: false
     }
     this.timer = this.timer.bind(this);
     this.toggleRunning = this.toggleRunning.bind(this);
+    this.refresh = this.refresh.bind(this);
     this.reset = this.reset.bind(this);
     this.decrementBreak = this.decrementBreak.bind(this);
     this.incrementBreak = this.incrementBreak.bind(this);
@@ -24,7 +27,7 @@ class App extends Component {
   //test setTimeout
   timer(){
     const timerID = setInterval(()=>{
-      if(this.state.minutes > 0 && this.state.seconds > 0 && this.state.running){
+      if(this.state.minutes >= 0 && this.state.seconds > 0 && this.state.running){
         this.setState({
           seconds: this.state.seconds - 1
         })
@@ -33,8 +36,25 @@ class App extends Component {
           minutes: this.state.minutes - 1,
           seconds: 59
         })
-      } 
-      else {
+      } else if (this.state.minutes === 0 
+        && this.state.seconds === 0 
+        && this.state.running
+        && this.state.mode === "Session"){
+          this.setState({
+            minutes: this.state.breakLength,
+            seconds: 0,
+            mode: "Break"
+          })
+      } else if (this.state.minutes === 0 
+        && this.state.seconds === 0 
+        && this.state.running
+        && this.state.mode === "Break"){
+          this.setState({
+            minutes: this.state.breakLength,
+            seconds: 0,
+            mode: "Session"
+        })
+      } else {
         clearInterval(timerID)
       }
     }, 1000);
@@ -45,16 +65,36 @@ class App extends Component {
     if(this.state.running){
       console.log("running: " + this.state.running);
       this.setState({
-        running: false
+        running: false,
       })
     } else {
       console.log("running: " + this.state.running);  
       this.timer();
         this.setState({
-          running: true
+          running: true,
+          started: true
         })
       }
     }
+
+  //refreash button
+  refresh(){
+    if(this.state.mode === "Session"){
+      this.setState({
+        running: false,
+        started: false,
+        minutes: this.state.sessionLength,
+        seconds: 0
+      })
+    } else if(this.state.mode === "Break"){
+      this.setState({
+        running: false,
+        started: false,
+        minutes: this.state.breakLength,
+        seconds: 0        
+      })
+    }
+  }
 
   //reset button
   reset(){
@@ -64,7 +104,8 @@ class App extends Component {
         seconds: 0,
         breakLength: 5,
         sessionLength: 25,
-        running: false
+        running: false,
+        mode: "Session"
       }
     )
   }
@@ -74,33 +115,64 @@ class App extends Component {
   need to be changed to breakMinutes and sessionMinutes.
   */
   decrementBreak() {
-		if(this.state.breakLength > 1 && !this.state.running){
+		if(this.state.breakLength > 1 
+      && this.state.started === false 
+      && this.state.mode === "Break"){
         this.setState({
-        breakLength: this.state.breakLength - 1,
-        minutes: this.state.breakLength - 1,
-        seconds: 0
+          breakLength: this.state.breakLength - 1,
+          minutes: this.state.breakLength - 1,
+          seconds: 0
+        })
+      } else if(this.state.breakLength > 1){
+        this.setState({
+        breakLength: this.state.breakLength - 1
       })
     }
   }
 
   incrementBreak() {
-    if(this.state.breakLength < 59){
-      this.setState({
-        breakLength: this.state.breakLength + 1
-      })
-    }
+    if(this.state.breakLength < 60 
+      && this.state.running === false
+      && this.state.mode === "Break"){
+        this.setState({
+          breakLength: this.state.breakLength + 1,
+          minutes: this.state.breakLength + 1,
+          seconds: 0
+        })
+      } else if(this.state.breakLength < 60){
+        this.setState({
+          breakLength: this.state.breakLength + 1
+        })
+      } 
   }
 
   decrementSession() {
-    if(this.state.sessionLength > 1){
+    if(this.state.sessionLength > 1 
+      && this.state.started === false
+      && this.state.mode === "Session")
+        {
+          this.setState({
+            sessionLength: this.state.sessionLength - 1,
+            minutes: this.state.sessionLength - 1,
+            seconds: 0
+          })
+        } else if(this.state.sessionLength > 1){
       this.setState({
         sessionLength: this.state.sessionLength - 1
-      })
+      })    
     }
   }
 
   incrementSession() {
-    if(this.state.sessionLength < 59){
+    if(this.state.sessionLength < 60 
+      && this.state.started === false
+      && this.state.mode === "Session"){
+        this.setState({
+          sessionLength: this.state.sessionLength + 1,
+          minutes: this.state.sessionLength + 1,
+          seconds: 0
+        })
+      } else if(this.state.sessionLength < 60){
       this.setState({
         sessionLength: this.state.sessionLength + 1
       })
@@ -112,19 +184,24 @@ class App extends Component {
     return (
       <div className="App">
         <header className="App-header">
-          <Session minutes={this.state.minutes} seconds={this.state.seconds}/>
+          <Session 
+            minutes={this.state.minutes} 
+            seconds={this.state.seconds}
+            mode={this.state.mode}
+          />
           <button id="start_stop" onClick={this.toggleRunning}>Start/Stop</button>
-          <button id="reset" onClick={this.reset}>Reset</button>
+          <button id="refresh" onClick={this.refresh}>Refresh</button>
           <BreakControls 
             breakLength={this.state.breakLength}
             decrement={this.decrementBreak}
             increment={this.incrementBreak}
-            />
-            <SessionControls 
-              sessionLength={this.state.sessionLength}
-              decrement={this.decrementSession}
-              increment={this.incrementSession}
-              />
+          />
+          <SessionControls 
+            sessionLength={this.state.sessionLength}
+            decrement={this.decrementSession}
+            increment={this.incrementSession}
+          />
+          <button id="reset" onClick={this.reset}>Reset</button>
         </header>
       </div>
     );
@@ -134,8 +211,8 @@ class App extends Component {
 function Session (props) {
   return (
     <div>
-      <h3 id="timer-label">Session</h3>
-      <h1 id="time-left">{props.minutes}:{("0" + props.seconds).slice(-2)}</h1>
+      <h3 id="timer-label">{props.mode}</h3>
+      <h1 id="time-left">{("0" + props.minutes).slice(-2)}:{("0" + props.seconds).slice(-2)}</h1>
     </div>
   );
 }
