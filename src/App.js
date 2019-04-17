@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
+import alarm from './alarm-sound.mp3';
 
 class App extends Component {
   constructor(props) {
@@ -18,11 +19,14 @@ class App extends Component {
     this.toggleRunning = this.toggleRunning.bind(this);
     this.refresh = this.refresh.bind(this);
     this.reset = this.reset.bind(this);
+    this.playAlarm = this.playAlarm.bind(this);
     this.decrementBreak = this.decrementBreak.bind(this);
     this.incrementBreak = this.incrementBreak.bind(this);
     this.decrementSession = this.decrementSession.bind(this);
     this.incrementSession = this.incrementSession.bind(this);
+    
   }
+  audio = document.getElementById("beep");
 
   //test setTimeout
   timer(){
@@ -40,6 +44,7 @@ class App extends Component {
         && this.state.seconds === 0 
         && this.state.running
         && this.state.mode === "Session"){
+          this.playAlarm();
           this.setState({
             minutes: this.state.breakLength,
             seconds: 0,
@@ -49,6 +54,7 @@ class App extends Component {
         && this.state.seconds === 0 
         && this.state.running
         && this.state.mode === "Break"){
+          this.playAlarm();
           this.setState({
             minutes: this.state.breakLength,
             seconds: 0,
@@ -98,6 +104,9 @@ class App extends Component {
 
   //reset button
   reset(){
+    const audio = document.getElementById("beep");
+    audio.currentTime = 0;
+    audio.pause();
     this.setState(
       {
         minutes: 25, 
@@ -108,6 +117,13 @@ class App extends Component {
         mode: "Session"
       }
     )
+  }
+
+  playAlarm(){
+    console.log("playAlarm");
+    const audio = document.getElementById("beep");
+    audio.currentTime = 0;
+    audio.play();
   }
 
   /*need to update increment and decrement functions so break length and 
@@ -183,25 +199,30 @@ class App extends Component {
   render() {
     return (
       <div className="App">
-        <header className="App-header">
+        <header className="timerBody">
           <Session 
             minutes={this.state.minutes} 
             seconds={this.state.seconds}
             mode={this.state.mode}
           />
-          <button id="start_stop" onClick={this.toggleRunning}>Start/Stop</button>
-          <button id="refresh" onClick={this.refresh}>Refresh</button>
-          <BreakControls 
-            breakLength={this.state.breakLength}
-            decrement={this.decrementBreak}
-            increment={this.incrementBreak}
-          />
-          <SessionControls 
-            sessionLength={this.state.sessionLength}
-            decrement={this.decrementSession}
-            increment={this.incrementSession}
-          />
-          <button id="reset" onClick={this.reset}>Reset</button>
+          <div id="timerButtons">
+            <button id="start_stop" onClick={this.toggleRunning}>Start/Stop</button>
+            <button id="refresh" onClick={this.refresh}>Refresh</button>
+          </div>
+           <div id="controls">
+            <BreakControls 
+              breakLength={this.state.breakLength}
+              decrement={this.decrementBreak}
+              increment={this.incrementBreak}
+            />
+            <SessionControls 
+              sessionLength={this.state.sessionLength}
+              decrement={this.decrementSession}
+              increment={this.incrementSession}
+            />
+          </div>
+            <button id="reset" onClick={this.reset}>Reset</button>
+            <audio id="beep" src={alarm}></audio>
         </header>
       </div>
     );
@@ -219,7 +240,7 @@ function Session (props) {
 
 function BreakControls (props) {
   return(
-    <div>
+    <div id="breakControls" className="controls">
       <h4 id="break-label">Break Length</h4>
       <p id="break-length">{props.breakLength}</p>
       <button id="break-decrement" onClick={props.decrement}>-</button>
@@ -230,7 +251,7 @@ function BreakControls (props) {
 
 function SessionControls (props) {
   return(
-    <div>
+    <div id="sessionControls" className="controls">
       <h4 id="session-label">Session Length</h4>
       <p id="session-length">{props.sessionLength}</p>
       <button id="session-decrement" onClick={props.decrement}>-</button>
