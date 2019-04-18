@@ -199,15 +199,27 @@ class App extends Component {
   render() {
     return (
       <div className="App">
+          <div id="title">
+            <h3 style={{color: "white"}}>Pomodoro Clock by</h3>
+            <h3><a href="https://tomporvaz.github.io/">Tom Porvaznik</a></h3>
+          </div>
         <header className="timerBody">
+
           <Session 
             minutes={this.state.minutes} 
             seconds={this.state.seconds}
             mode={this.state.mode}
           />
           <div id="timerButtons">
-            <button id="start_stop" onClick={this.toggleRunning}>Start/Stop</button>
-            <button id="refresh" onClick={this.refresh}>Refresh</button>
+            <button id="start_stop" 
+              onClick={this.toggleRunning} 
+              alt="Start/Stop" className="start-refresh">
+                <i class="fas fa-play"></i>
+                <i class="fas fa-pause"></i>
+            </button>
+            <button id="refresh" onClick={this.refresh} className="start-refresh" alt="Refresh">
+              <i class="fas fa-sync-alt"></i>
+            </button>
           </div>
            <div id="controls">
             <BreakControls 
@@ -243,8 +255,8 @@ function BreakControls (props) {
     <div id="breakControls" className="controls">
       <h4 id="break-label">Break Length</h4>
       <p id="break-length">{props.breakLength}</p>
-      <button id="break-decrement" onClick={props.decrement}>-</button>
-      <button id="break-increment" onClick={props.increment}>+</button>
+      <button id="break-decrement" className="control-button" onClick={props.decrement}>-</button>
+      <button id="break-increment" className="control-button" onClick={props.increment}>+</button>
     </div> 
   );
 }
@@ -254,8 +266,8 @@ function SessionControls (props) {
     <div id="sessionControls" className="controls">
       <h4 id="session-label">Session Length</h4>
       <p id="session-length">{props.sessionLength}</p>
-      <button id="session-decrement" onClick={props.decrement}>-</button>
-      <button id="session-increment" onClick={props.increment}>+</button>
+      <button id="session-decrement" className="control-button" onClick={props.decrement}>-</button>
+      <button id="session-increment" className="control-button" onClick={props.increment}>+</button>
     </div>
   )
 }
