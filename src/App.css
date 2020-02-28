@@ -14,6 +14,14 @@ a{
   
 }
 
+#githubbtn{
+  text-align: right;
+  padding: 3vh;
+  position: absolute;
+  right: 0;
+
+}
+
 .timerBody {
   
   

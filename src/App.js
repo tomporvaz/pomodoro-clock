@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
 import alarm from './alarm-sound.mp3';
+import GitHubButton from 'react-github-btn';
 
 class App extends Component {
   constructor(props) {
@@ -199,6 +200,10 @@ class App extends Component {
   render() {
     return (
       <div className="App">
+          <div id="githubbtn">
+          <GitHubButton  href="https://github.com/tomporvaz/pomodoro-clock">View on GitHub</GitHubButton>
+          </div>
+          
           <div id="title">
             <h3 style={{color: "white"}}>Pomodoro Clock by</h3>
             <h3><a href="https://tomporvaz.github.io/">Tom Porvaznik</a></h3>
