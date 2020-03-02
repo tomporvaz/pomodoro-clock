@@ -206,7 +206,7 @@ class App extends Component {
           
           <div id="title">
             <h3 style={{color: "white"}}>Pomodoro Clock by</h3>
-            <h3><a href="https://tomporvaz.github.io/">Tom Porvaznik</a></h3>
+            <h3><a href="https://porkpotato.com/">Tom Porvaznik</a></h3>
           </div>
         <header className="timerBody">
 
